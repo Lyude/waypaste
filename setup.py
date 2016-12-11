@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 
 from setuptools import setup, find_packages
+from waypaste.version import __version__
 setup(
     name="waypaste",
-    version="0.1",
+    version=__version__,
     packages=['waypaste'],
     entry_points={
         'console_scripts': [

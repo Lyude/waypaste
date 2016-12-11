@@ -22,6 +22,7 @@ import logging
 from logging import debug, error, info
 from os import fork
 from sys import exit
+from waypaste.version import __version__
 
 class WaylandContext():
     class SelectionChanged(Exception):
@@ -136,6 +137,8 @@ def main():
         prog='waypaste',
         description="A CLI interface to set the clipboard contents of wayland applications."
     )
+    parser.add_argument('--version', '-V', action='version',
+                        version=__version__)
     parser.add_argument('source', help='The source to copy from',
                         default='/dev/stdin', nargs='?');
     parser.add_argument('--verbose', '-v', help='Be louder', action='store_const',
