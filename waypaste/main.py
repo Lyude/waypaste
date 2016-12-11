@@ -117,12 +117,14 @@ class MainThread(Thread):
     def run(self):
         while True:
             try:
-                mime_type, fd = ctx.wait_for_paste()
+                mime_type, fd = self.ctx.wait_for_paste()
 
                 debug("Sending data")
-                if data_source.seekable():
-                    data_source.seek(0)
-                    paste_data = data_source.read()
+                if self.data_source.seekable():
+                    self.data_source.seek(0)
+                    paste_data = self.data_source.read()
+                else:
+                    paste_data = self.paste_data
 
                 open(fd, "wb").write(paste_data)
             except WaylandContext.SelectionChanged:
