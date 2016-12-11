@@ -17,7 +17,6 @@ import argparse
 from pywayland.protocol.wayland import Seat, DataDeviceManager
 from pywayland.protocol.wayland.dataoffer import DataOffer
 from pywayland.client.display import Display
-import pywayland
 import logging
 from logging import debug, error, info
 from os import fork
