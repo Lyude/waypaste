@@ -128,7 +128,7 @@ class MainThread(Thread):
             except WaylandContext.SelectionChanged:
                 break
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         prog='waypaste',
         description="A CLI interface to set the clipboard contents of wayland applications."
@@ -160,3 +160,6 @@ if __name__ == "__main__":
     main_thread = MainThread(ctx, data_source, paste_data)
     main_thread.start()
     main_thread.join()
+
+if __name__ == "__main__":
+    main()
