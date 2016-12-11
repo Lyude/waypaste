@@ -73,10 +73,8 @@ class WaylandContext():
         self._send_args = (mime_type, fd)
 
     def _cancelled_handler(self, data_source):
-        self._cancelled_count += 1
-        # Two cancels in a row seems to indicate the selection actually changed
-        if self._cancelled_count == 2:
-            self._send_args = WaylandContext.SelectionChanged()
+        debug("Selection changed, exiting")
+        self._send_args = WaylandContext.SelectionChanged()
 
     def create_data_source(self, mime_types):
         debug("Creating data source")
