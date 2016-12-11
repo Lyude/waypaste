@@ -17,6 +17,7 @@ import argparse
 from pywayland.protocol.wayland import Seat, DataDeviceManager
 from pywayland.protocol.wayland.dataoffer import DataOffer
 from pywayland.client.display import Display
+from threading import Thread
 import logging
 from logging import debug, error, info
 from os import fork
@@ -104,6 +105,30 @@ class WaylandContext():
         del self._send_args
         return ret
 
+# We run the wayland dispatch loop in a seperate thread so that we can still
+# handle signals like SIGINT
+class MainThread(Thread):
+    def __init__(self, ctx, data_source, paste_data):
+        super().__init__()
+        self.ctx = ctx
+        self.data_source = data_source
+        self.paste_data = paste_data
+        self.daemon = True
+
+    def run(self):
+        while True:
+            try:
+                mime_type, fd = ctx.wait_for_paste()
+
+                debug("Sending data")
+                if data_source.seekable():
+                    data_source.seek(0)
+                    paste_data = data_source.read()
+
+                open(fd, "wb").write(paste_data)
+            except WaylandContext.SelectionChanged:
+                break
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='waypaste',
                                      description="A CLI interface to copy from Wayland applications")
@@ -128,16 +153,9 @@ if __name__ == "__main__":
     data_source = open(args.source, "rb")
     if not data_source.seekable():
         paste_data = data_source.read()
+    else:
+        paste_data = None
 
-    while True:
-        try:
-            mime_type, fd = ctx.wait_for_paste()
-
-            debug("Sending data")
-            if data_source.seekable():
-                data_source.seek(0)
-                paste_data = data_source.read()
-
-            open(fd, "wb").write(paste_data)
-        except WaylandContext.SelectionChanged:
-            break
+    main_thread = MainThread(ctx, data_source, paste_data)
+    main_thread.start()
+    main_thread.join()
