@@ -169,9 +169,12 @@ def main():
             debug("Forked into the background, exiting")
             exit(0)
 
-    main_thread = MainThread(ctx, data_source, paste_data)
-    main_thread.start()
-    main_thread.join()
+    try:
+        main_thread = MainThread(ctx, data_source, paste_data)
+        main_thread.start()
+        main_thread.join()
+    except KeyboardInterrupt:
+        print("Received ^C, exiting")
 
 if __name__ == "__main__":
     main()
