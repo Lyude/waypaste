@@ -21,7 +21,6 @@ from threading import Thread
 import logging
 from logging import debug, error, info
 from os import fork
-from sys import exit
 
 class WaylandContext():
     class SelectionChanged(Exception):
