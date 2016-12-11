@@ -109,7 +109,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='waypaste',
                                      description="A CLI interface to copy from Wayland applications")
     parser.add_argument('source', help='The source to copy from',
-                        default='/dev/stdin');
+                        default='/dev/stdin', nargs='?');
     parser.add_argument('--verbose', '-v', help='Be louder', action='store_const',
                         dest='loglevel', const=logging.DEBUG, default=logging.INFO)
 
