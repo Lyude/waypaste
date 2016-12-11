@@ -21,6 +21,7 @@ from threading import Thread
 import logging
 from logging import debug, error, info
 from os import fork
+from sys import exit
 
 class WaylandContext():
     class SelectionChanged(Exception):
@@ -139,6 +140,9 @@ def main():
                         default='/dev/stdin', nargs='?');
     parser.add_argument('--verbose', '-v', help='Be louder', action='store_const',
                         dest='loglevel', const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument('--foreground', '-f',
+                        help='Don\'t fork into the background after beginning to host clipboard data',
+                        action='store_true')
 
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
@@ -158,6 +162,12 @@ def main():
         paste_data = data_source.read()
     else:
         paste_data = None
+
+    if not args.foreground:
+        # Fork from the command line
+        if fork() != 0:
+            debug("Forked into the background, exiting")
+            exit(0)
 
     main_thread = MainThread(ctx, data_source, paste_data)
     main_thread.start()
