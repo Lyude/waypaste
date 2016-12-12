@@ -20,8 +20,9 @@ from pywayland.client.display import Display
 from threading import Thread
 import logging
 from logging import debug, error, info
-from os import fork
+from os import fork, O_NONBLOCK
 from sys import exit
+import fcntl
 from waypaste.version import __version__
 
 class WaylandContext():
@@ -128,7 +129,11 @@ class MainThread(Thread):
                 else:
                     paste_data = self.paste_data
 
-                open(fd, "wb").write(paste_data)
+                with open(fd, "wb") as out:
+                    # Set the file descriptor as blocking
+                    fcntl.fcntl(out, fcntl.F_SETFL,
+                                fcntl.fcntl(out, fcntl.F_GETFL) & ~O_NONBLOCK)
+                    out.write(paste_data)
             except WaylandContext.SelectionChanged:
                 break
 
