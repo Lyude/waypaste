@@ -20,8 +20,7 @@ from pywayland.client.display import Display
 from threading import Thread
 import logging
 from logging import debug, error, info
-from os import fork, O_NONBLOCK
-from sys import exit
+from os import fork, O_NONBLOCK, _exit
 import fcntl
 from waypaste.version import __version__
 
@@ -175,7 +174,7 @@ def main():
         # Fork from the command line
         if fork() != 0:
             debug("Forked into the background, exiting")
-            exit(0)
+            _exit(0)
 
     try:
         main_thread = MainThread(ctx, data_source, paste_data)
