@@ -20,7 +20,8 @@ from pywayland.client.display import Display
 from threading import Thread
 import logging
 from logging import debug, error, info
-from os import fork, O_NONBLOCK, _exit
+from os import fork, O_NONBLOCK, _exit, environ
+from sys import stderr, exit
 import fcntl
 from waypaste.version import __version__
 
@@ -39,9 +40,16 @@ class WaylandContext():
     def __init__(self):
         self._cancelled_count = 0
 
-        debug("Connecting to wayland display")
-        self.display = Display()
-        self.display.connect()
+        try:
+            debug("Connecting to wayland display")
+            self.display = Display()
+            self.display.connect()
+        except Exception as e:
+            if 'WAYLAND_DISPLAY' not in environ or \
+               environ['WAYLAND_DISPLAY'] == '':
+                raise Exception("WAYLAND_DISPLAY is not set") from e
+            else:
+                raise e from e
 
         debug("Getting global registry")
         self.registry = self.display.get_registry()
@@ -154,7 +162,11 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
 
-    ctx = WaylandContext()
+    try:
+        ctx = WaylandContext()
+    except Exception as e:
+        stderr.write("Failed to connect to wayland display: %s\n" % e.args)
+        exit(1)
 
     # STRING and TEXT definitely aren't mime types, but some applications seem
     # to need them before they acknowledge anything on the clipboard
