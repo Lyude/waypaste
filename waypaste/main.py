@@ -146,7 +146,9 @@ def main():
     )
     parser.add_argument('--version', '-V', action='version',
                         version=__version__)
-    parser.add_argument('source', help='The source to copy from',
+    parser.add_argument('source',
+                        help='The source to copy from. If no source is ' +\
+                             'specified, this defaults to /dev/stdin.',
                         default='/dev/stdin', nargs='?');
     parser.add_argument('--verbose', '-v', help='Be louder', action='store_const',
                         dest='loglevel', const=logging.DEBUG, default=logging.INFO)
