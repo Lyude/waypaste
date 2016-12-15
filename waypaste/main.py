@@ -38,8 +38,6 @@ class WaylandContext():
             self.seat = wl_registry.bind(id, Seat, version)
 
     def __init__(self):
-        self._cancelled_count = 0
-
         try:
             debug("Connecting to wayland display")
             self.display = Display()
