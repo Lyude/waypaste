@@ -169,9 +169,12 @@ def main():
     # STRING and TEXT definitely aren't mime types, but some applications seem
     # to need them before they acknowledge anything on the clipboard
     ctx.create_data_source([
-        'text/plain',
-        'STRING',
+        'UTF8_STRING',
+        'COMPOUND_TEXT',
         'TEXT',
+        'STRING',
+        'text/plain',
+        'text/plain;charset=utf-8',
     ])
 
     data_source = open(args.source, "rb")
