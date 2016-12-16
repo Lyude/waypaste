@@ -19,9 +19,11 @@ from pywayland.client.display import Display
 from threading import Thread
 import logging
 from logging import debug, error, info
+import os
 from os import fork, O_NONBLOCK, _exit, environ
 from sys import stderr, exit
 import fcntl
+import stat
 from waypaste.version import __version__
 
 class WaylandContext():
@@ -177,7 +179,12 @@ def main():
     ])
 
     data_source = open(args.source, "rb")
-    if not data_source.seekable():
+    # Non-regular files (e.g. pipes or character devices) will have output that
+    # changes or hooks into kernel drivers every read. So at the expense of
+    # extra memory usage, we cache the current contents of the input and use
+    # that as the clipboard data.
+    mode = os.stat(args.source).st_mode
+    if stat.S_ISBLK(mode) or stat.S_ISCHR(mode) or not data_source.seekable:
         paste_data = data_source.read()
     else:
         paste_data = None
