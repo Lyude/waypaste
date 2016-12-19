@@ -166,8 +166,7 @@ except Exception as e:
     stderr.write("Failed to connect to wayland display: %s\n" % e.args)
     exit(1)
 
-# STRING and TEXT definitely aren't mime types, but some applications seem
-# to need them before they acknowledge anything on the clipboard
+# Mime types most Wayland applications will recongnize as text
 ctx.create_data_source([
     'UTF8_STRING',
     'COMPOUND_TEXT',
