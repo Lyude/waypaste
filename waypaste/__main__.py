@@ -184,7 +184,8 @@ def main():
     # extra memory usage, we cache the current contents of the input and use
     # that as the clipboard data.
     mode = os.stat(args.source).st_mode
-    if stat.S_ISBLK(mode) or stat.S_ISCHR(mode) or not data_source.seekable:
+    if stat.S_ISBLK(mode) or stat.S_ISCHR(mode) or stat.S_ISFIFO(mode) or \
+       not data_source.seekable:
         paste_data = data_source.read()
     else:
         paste_data = None
