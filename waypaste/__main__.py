@@ -161,42 +161,43 @@ args = parser.parse_args()
 logging.basicConfig(level=args.loglevel)
 
 try:
-    ctx = WaylandContext()
-except Exception as e:
-    stderr.write("Failed to connect to wayland display: %s\n" % e.args)
-    exit(1)
+    try:
+        ctx = WaylandContext()
+    except Exception as e:
+        stderr.write("Failed to connect to wayland display: %s\n" % e.args)
+        exit(1)
 
-# Mime types most Wayland applications will recongnize as text
-ctx.create_data_source([
-    'UTF8_STRING',
-    'COMPOUND_TEXT',
-    'TEXT',
-    'STRING',
-    'text/plain',
-    'text/plain;charset=utf-8',
-])
+    # Mime types most Wayland applications will recongnize as text
+    ctx.create_data_source([
+        'UTF8_STRING',
+        'COMPOUND_TEXT',
+        'TEXT',
+        'STRING',
+        'text/plain',
+        'text/plain;charset=utf-8',
+    ])
 
-data_source = open(args.source, "rb")
-# Non-regular files (e.g. pipes or character devices) will have output that
-# changes or hooks into kernel drivers every read. So at the expense of
-# extra memory usage, we cache the current contents of the input and use
-# that as the clipboard data.
-mode = os.stat(args.source).st_mode
-if stat.S_ISBLK(mode) or stat.S_ISCHR(mode) or stat.S_ISFIFO(mode) or \
-   not data_source.seekable:
-    paste_data = data_source.read()
-else:
-    paste_data = None
+    data_source = open(args.source, "rb")
+    # Non-regular files (e.g. pipes or character devices) will have output that
+    # changes or hooks into kernel drivers every read. So at the expense of
+    # extra memory usage, we cache the current contents of the input and use
+    # that as the clipboard data.
+    mode = os.stat(args.source).st_mode
+    if stat.S_ISBLK(mode) or stat.S_ISCHR(mode) or stat.S_ISFIFO(mode) or \
+       not data_source.seekable:
+        paste_data = data_source.read()
+    else:
+        paste_data = None
 
-if not args.foreground:
-    # Fork from the command line
-    if fork() != 0:
-        debug("Forked into the background, exiting")
-        _exit(0)
+    if not args.foreground:
+        # Fork from the command line
+        if fork() != 0:
+            debug("Forked into the background, exiting")
+            _exit(0)
 
-try:
     main_thread = MainThread(ctx, data_source, paste_data)
     main_thread.start()
     main_thread.join()
 except KeyboardInterrupt:
-    print("Received ^C, exiting")
+    print("")
+    exit(130)
