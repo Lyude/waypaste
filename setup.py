@@ -8,7 +8,7 @@ setup(
     packages=['waypaste'],
     entry_points={
         'console_scripts': [
-            'waypaste = waypaste.__main__:main'
+            'waypaste = waypaste.__main__'
         ]
     },
 
